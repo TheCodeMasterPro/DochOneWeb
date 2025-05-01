@@ -117,13 +117,11 @@ export default function WorkCalendar() {
                       </div>
                     </button>
                   </DialogTrigger>
-                  <DialogContent>
+                  <DialogContent className="[&>button:last-child]:right-auto [&>button:last-child]:left-4">
                     <DialogHeader>
-                      <DialogTitle>Details for {format(day, "MMMM d, yyyy")}</DialogTitle>
-                      <DialogDescription>
-                          <span className={`text-sm`}>
-                            {reportedDates[day.toISOString()]}
-                          </span>
+                      <DialogTitle className="text-right">פרטים עבור {format(day, "d MMMM yyyy").replace('January', 'ינואר').replace('February', 'פברואר').replace('March', 'מרץ').replace('April', 'אפריל').replace('May', 'מאי').replace('June', 'יוני').replace('July', 'יולי').replace('August', 'אוגוסט').replace('September', 'ספטמבר').replace('October', 'אוקטובר').replace('November', 'נובמבר').replace('December', 'דצמבר')}</DialogTitle>
+                      <DialogDescription className="text-right">
+                          {reportedDates[day.toISOString()]}
                       </DialogDescription>
                     </DialogHeader>
                     <DropdownMenu>
