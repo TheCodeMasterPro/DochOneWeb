@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, startOfWeek, endOfWeek, addDays } from "date-fns"
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, startOfWeek, endOfWeek, addDays, isToday } from "date-fns"
 import { Calendar, ChevronLeft, ChevronRight, Trash2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -136,7 +136,9 @@ export default function WorkCalendar() {
                       `}
                     >
                       <div className="flex flex-col h-full justify-between">
-                        <span>{format(day, "d")}</span>
+                        <span className={`${isToday(day) ? "bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center mx-auto" : ""}`}>
+                          {format(day, "d")}
+                        </span>
                         {reportedDates[day.toISOString()] ? (
                           <Badge 
                             className={`hidden sm:block text-[10px] sm:text-xs ${
