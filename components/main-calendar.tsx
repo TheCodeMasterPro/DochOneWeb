@@ -85,36 +85,36 @@ export default function WorkCalendar() {
   }
 
   return (
-    <div className="container mx-auto">
-      <Card className="max-w-3xl mx-auto">
+    <div className="w-full max-w-3xl px-2 sm:px-4 mx-auto">
+      <Card className="w-full">
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between ml-auto">
-            <CardTitle className="text-2xl font-bold flex items-center gap-2">
+            <CardTitle className="text-xl sm:text-2xl font-bold flex items-center gap-2">
               דוח 1
-              <Calendar className="h-6 w-6" />
+              <Calendar className="h-5 w-5 sm:h-6 sm:w-6" />
             </CardTitle>
           </div>
         </CardHeader>
         <CardContent>
           <div className="mb-4 flex items-center justify-between">
-            <Button variant="outline" onClick={nextMonth}>
-              <ChevronLeft className="h-4 w-4 mr-1" />
-              חודש קדימה
+            <Button variant="outline" onClick={nextMonth} className="text-xs sm:text-sm mr-1">
+              <ChevronLeft className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+               קדימה
             </Button>
             <div className="flex flex-col items-center gap-2">
-              <h2 className="text-center text-2xl font-semibold mx-4" dir="rtl">{format(currentDate, "MMMM yyyy").replace('January', 'ינואר').replace('February', 'פברואר').replace('March', 'מרץ').replace('April', 'אפריל').replace('May', 'מאי').replace('June', 'יוני').replace('July', 'יולי').replace('August', 'אוגוסט').replace('September', 'ספטמבר').replace('October', 'אוקטובר').replace('November', 'נובמבר').replace('December', 'דצמבר')}</h2>
-              <Button variant="secondary" size="sm" onClick={goToCurrentMonth}>
-                חזור לחודש הנוכחי
+              <h2 className="text-center text-lg sm:text-2xl font-semibold mx-2 sm:mx-4" dir="rtl">{format(currentDate, "MMMM yyyy").replace('January', 'ינואר').replace('February', 'פברואר').replace('March', 'מרץ').replace('April', 'אפריל').replace('May', 'מאי').replace('June', 'יוני').replace('July', 'יולי').replace('August', 'אוגוסט').replace('September', 'ספטמבר').replace('October', 'אוקטובר').replace('November', 'נובמבר').replace('December', 'דצמבר')}</h2>
+              <Button variant="secondary" size="sm" onClick={goToCurrentMonth} className="text-xs sm:text-sm">
+                חודש הנוכחי
               </Button>
             </div>
-            <Button variant="outline" onClick={prevMonth}>
-            חודש אחורה
-            <ChevronRight className="h-4 w-4 ml-1" />
-              </Button>
+            <Button variant="outline" onClick={prevMonth} className="text-xs sm:text-sm ml-1">
+             אחורה
+              <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4 ml-1" />
+            </Button>
           </div>
           <div className="grid grid-cols-7 gap-1 text-center mb-2" dir="rtl">
             {["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"].map((day) => (
-              <div key={day} className="font-medium text-sm py-1">
+              <div key={day} className="font-medium text-xs sm:text-sm py-1">
                 {day}
               </div>
             ))}
@@ -132,13 +132,14 @@ export default function WorkCalendar() {
                         ${!isSameMonth(day, currentDate) ? "opacity-50" : ""}
                         hover:bg-primary-50
                         transition-colors
+                        text-xs sm:text-sm
                       `}
                     >
                       <div className="flex flex-col h-full justify-between">
-                        <span className="text-sm">{format(day, "d")}</span>
+                        <span>{format(day, "d")}</span>
                         {reportedDates[day.toISOString()] ? (
                           <Badge 
-                            className={`hidden sm:block ${
+                            className={`hidden sm:block text-[10px] sm:text-xs ${
                               reportedDates[day.toISOString()] === "בתפקיד מחוץ ליחידה" 
                                 ? "bg-blue-500 hover:bg-blue-600" 
                                 : reportedDates[day.toISOString()] === "אחרי תורנות / משמרת"
@@ -151,12 +152,12 @@ export default function WorkCalendar() {
             ) : null }
             {reportedDates[day.toISOString()] ? (
                           <Badge 
-                            className={`block sm:hidden ${
+                            className={`block sm:hidden w-2 h-2 mx-auto ${
                               reportedDates[day.toISOString()] === "בתפקיד מחוץ ליחידה" 
-                                ? "bg-blue-500 hover:bg-blue-600" 
+                                ? "bg-blue-500" 
                                 : reportedDates[day.toISOString()] === "אחרי תורנות / משמרת"
-                                ? "bg-purple-500 hover:bg-purple-600"
-                                : "bg-green-500 hover:bg-green-600"
+                                ? "bg-purple-500"
+                                : "bg-green-500"
                             }`}
                           >
                           </Badge>
@@ -185,7 +186,7 @@ export default function WorkCalendar() {
                       )}
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="outline" className="flex-grow">
+                          <Button variant="outline" className="flex-grow text-xs sm:text-sm">
                             ?איפה תהיו בתאריך היעד
                           </Button>
                         </DropdownMenuTrigger>
