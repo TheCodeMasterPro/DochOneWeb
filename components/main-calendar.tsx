@@ -104,7 +104,7 @@ export default function WorkCalendar() {
             <div className="flex flex-col items-center gap-2">
               <h2 className="text-center text-lg sm:text-2xl font-semibold mx-2 sm:mx-4" dir="rtl">{format(currentDate, "MMMM yyyy").replace('January', 'ינואר').replace('February', 'פברואר').replace('March', 'מרץ').replace('April', 'אפריל').replace('May', 'מאי').replace('June', 'יוני').replace('July', 'יולי').replace('August', 'אוגוסט').replace('September', 'ספטמבר').replace('October', 'אוקטובר').replace('November', 'נובמבר').replace('December', 'דצמבר')}</h2>
               <Button variant="secondary" size="sm" onClick={goToCurrentMonth} className="text-xs sm:text-sm">
-                חודש הנוכחי
+                חודש נוכחי
               </Button>
             </div>
             <Button variant="outline" onClick={prevMonth} className="text-xs sm:text-sm ml-1">
