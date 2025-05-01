@@ -83,10 +83,11 @@ export default function WorkCalendar() {
       return newReports
     })
   }
+  
+  const today = new Date()
+  const israelDate = new Date(today.toLocaleString("en-US", { timeZone: "Asia/Jerusalem" }))
 
   const isDateToday = (date: Date) => {
-    const today = new Date()
-    const israelDate = new Date(today.toLocaleString("en-US", { timeZone: "Asia/Jerusalem" }))
     return isToday(date) && 
            date.getDate() === israelDate.getDate() &&
            date.getMonth() === israelDate.getMonth() &&
