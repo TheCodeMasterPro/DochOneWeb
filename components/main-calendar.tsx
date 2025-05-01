@@ -79,24 +79,23 @@ export default function WorkCalendar() {
           <div className="mb-4 flex items-center justify-between">
             <Button variant="outline" onClick={prevMonth}>
               <ChevronLeft className="h-4 w-4 mr-1" />
-              Previous
+              חודש קדימה
             </Button>
-            <h2 className="text-center text-xl font-semibold mx-4">{format(currentDate, "MMMM yyyy")}</h2>
+            <h2 className="text-center text-xl font-semibold mx-4" dir="rtl">{format(currentDate, "MMMM yyyy").replace('January', 'ינואר').replace('February', 'פברואר').replace('March', 'מרץ').replace('April', 'אפריל').replace('May', 'מאי').replace('June', 'יוני').replace('July', 'יולי').replace('August', 'אוגוסט').replace('September', 'ספטמבר').replace('October', 'אוקטובר').replace('November', 'נובמבר').replace('December', 'דצמבר')}</h2>
             <Button variant="outline" onClick={nextMonth}>
-              Next
-              <ChevronRight className="h-4 w-4 ml-1" />
-            </Button>
+            חודש אחורה
+            <ChevronRight className="h-4 w-4 ml-1" />
+              </Button>
           </div>
-
-          <div className="grid grid-cols-7 gap-1 text-center mb-2">
-            {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
+          <div className="grid grid-cols-7 gap-1 text-center mb-2" dir="rtl">
+            {["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"].map((day) => (
               <div key={day} className="font-medium text-sm py-1">
                 {day}
               </div>
             ))}
           </div>
 
-          <div className="grid grid-cols-7 gap-1">
+          <div className="grid grid-cols-7 gap-1" dir="rtl">
             {daysInMonth.map((day, index) => {
 
               return (
