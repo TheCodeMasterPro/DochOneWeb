@@ -1,8 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth } from "date-fns"
-import { Calendar, ChevronLeft, ChevronRight } from "lucide-react"
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, startOfWeek, endOfWeek, addDays } from "date-fns"
+import { Calendar, ChevronLeft, ChevronRight, Trash2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -38,10 +38,17 @@ export default function WorkCalendar() {
     localStorage.setItem("futureReports", JSON.stringify(reportedDates))
   }, [reportedDates])
 
-  // Get all days in the current month
+  // Get days for the calendar grid
   const monthStart = startOfMonth(currentDate)
   const monthEnd = endOfMonth(currentDate)
-  const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd })
+  const calendarStart = startOfWeek(monthStart)
+  const calendarEnd = endOfWeek(monthEnd)
+  
+  // Calculate days needed to fill the last row
+  const daysInCalendar = eachDayOfInterval({ start: calendarStart, end: calendarEnd })
+  const remainingCells = 42 - daysInCalendar.length // 42 = 6 rows × 7 days
+  const extendedCalendarEnd = remainingCells > 0 ? addDays(calendarEnd, remainingCells) : calendarEnd
+  const allDays = eachDayOfInterval({ start: calendarStart, end: extendedCalendarEnd })
 
   // Navigate to previous month
   const prevMonth = () => {
@@ -57,11 +64,24 @@ export default function WorkCalendar() {
     setCurrentDate(newDate)
   }
 
+  // Navigate to current month
+  const goToCurrentMonth = () => {
+    setCurrentDate(new Date())
+  }
+
   const sendFutureReport = (date: Date, status: FutureReportStatus) => {
     setReportedDates((prev) => ({
       ...prev,
       [date.toISOString()]: status,
     }))
+  }
+
+  const removeFutureReport = (date: Date) => {
+    setReportedDates((prev) => {
+      const newReports = { ...prev }
+      delete newReports[date.toISOString()]
+      return newReports
+    })
   }
 
   return (
@@ -77,12 +97,17 @@ export default function WorkCalendar() {
         </CardHeader>
         <CardContent>
           <div className="mb-4 flex items-center justify-between">
-            <Button variant="outline" onClick={prevMonth}>
+            <Button variant="outline" onClick={nextMonth}>
               <ChevronLeft className="h-4 w-4 mr-1" />
               חודש קדימה
             </Button>
-            <h2 className="text-center text-xl font-semibold mx-4" dir="rtl">{format(currentDate, "MMMM yyyy").replace('January', 'ינואר').replace('February', 'פברואר').replace('March', 'מרץ').replace('April', 'אפריל').replace('May', 'מאי').replace('June', 'יוני').replace('July', 'יולי').replace('August', 'אוגוסט').replace('September', 'ספטמבר').replace('October', 'אוקטובר').replace('November', 'נובמבר').replace('December', 'דצמבר')}</h2>
-            <Button variant="outline" onClick={nextMonth}>
+            <div className="flex flex-col items-center gap-2">
+              <h2 className="text-center text-2xl font-semibold mx-4" dir="rtl">{format(currentDate, "MMMM yyyy").replace('January', 'ינואר').replace('February', 'פברואר').replace('March', 'מרץ').replace('April', 'אפריל').replace('May', 'מאי').replace('June', 'יוני').replace('July', 'יולי').replace('August', 'אוגוסט').replace('September', 'ספטמבר').replace('October', 'אוקטובר').replace('November', 'נובמבר').replace('December', 'דצמבר')}</h2>
+              <Button variant="secondary" size="sm" onClick={goToCurrentMonth}>
+                חזור לחודש הנוכחי
+              </Button>
+            </div>
+            <Button variant="outline" onClick={prevMonth}>
             חודש אחורה
             <ChevronRight className="h-4 w-4 ml-1" />
               </Button>
@@ -96,8 +121,7 @@ export default function WorkCalendar() {
           </div>
 
           <div className="grid grid-cols-7 gap-1" dir="rtl">
-            {daysInMonth.map((day, index) => {
-
+            {allDays.map((day, index) => {
               return (
                 <Dialog key={index}>
                   <DialogTrigger asChild>
@@ -148,27 +172,40 @@ export default function WorkCalendar() {
                           {reportedDates[day.toISOString()]}
                       </DialogDescription>
                     </DialogHeader>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="outline" className="mt-4">
-                          ?איפה תהיו בתאריך היעד
+                    <div className="flex gap-2 mt-4">
+                    {reportedDates[day.toISOString()] && (
+                        <Button 
+                          variant="destructive" 
+                          size="icon"
+                          onClick={() => removeFutureReport(day)}
+                          title="מחק דיווח עתידי"
+                        >
+                          <Trash2 className="h-4 w-4" />
                         </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent className="w-40">
-                        <DropdownMenuGroup>
-                          <DropdownMenuSub>
-                            <DropdownMenuSubTrigger>מחוץ ליחידה</DropdownMenuSubTrigger>
-                            <DropdownMenuPortal>
-                              <DropdownMenuSubContent>
-                                <DropdownMenuItem onClick={(e) => sendFutureReport(day, "בתפקיד מחוץ ליחידה")}>בתפקיד מחוץ ליחידה</DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => sendFutureReport(day, "אחרי תורנות / משמרת")}>אחרי תורנות / משמרת</DropdownMenuItem>
-                              </DropdownMenuSubContent>
-                            </DropdownMenuPortal>
-                          </DropdownMenuSub>
-                          <DropdownMenuItem onClick={() => sendFutureReport(day, "חופשה שנתית")}>חופשה שנתית</DropdownMenuItem>
-                        </DropdownMenuGroup>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                      )}
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="outline" className="flex-grow">
+                            ?איפה תהיו בתאריך היעד
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="w-40">
+                          <DropdownMenuGroup>
+                            <DropdownMenuSub>
+                              <DropdownMenuSubTrigger>מחוץ ליחידה</DropdownMenuSubTrigger>
+                              <DropdownMenuPortal>
+                                <DropdownMenuSubContent>
+                                  <DropdownMenuItem onClick={() => sendFutureReport(day, "בתפקיד מחוץ ליחידה")}>בתפקיד מחוץ ליחידה</DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => sendFutureReport(day, "אחרי תורנות / משמרת")}>אחרי תורנות / משמרת</DropdownMenuItem>
+                                </DropdownMenuSubContent>
+                              </DropdownMenuPortal>
+                            </DropdownMenuSub>
+                            <DropdownMenuItem onClick={() => sendFutureReport(day, "חופשה שנתית")}>חופשה שנתית</DropdownMenuItem>
+                          </DropdownMenuGroup>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+
+                    </div>
                   </DialogContent>
                 </Dialog>
               )
