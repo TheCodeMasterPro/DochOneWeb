@@ -112,8 +112,32 @@ export default function WorkCalendar() {
                     >
                       <div className="flex flex-col h-full justify-between">
                         <span className="text-sm">{format(day, "d")}</span>
-                        {reportedDates[day.toISOString()] ? <Badge className="hidden sm:block">{reportedDates[day.toISOString()]}</Badge> : null}
-                        {reportedDates[day.toISOString()] ? <Badge className="block sm:hidden"></Badge> : null}
+                        {reportedDates[day.toISOString()] ? (
+                          <Badge 
+                            className={`hidden sm:block ${
+                              reportedDates[day.toISOString()] === "בתפקיד מחוץ ליחידה" 
+                                ? "bg-blue-500 hover:bg-blue-600" 
+                                : reportedDates[day.toISOString()] === "אחרי תורנות / משמרת"
+                                ? "bg-purple-500 hover:bg-purple-600"
+                                : "bg-green-500 hover:bg-green-600"
+                            }`}
+                          >
+                            {reportedDates[day.toISOString()]}
+                          </Badge>
+            ) : null }
+            {reportedDates[day.toISOString()] ? (
+                          <Badge 
+                            className={`block sm:hidden ${
+                              reportedDates[day.toISOString()] === "בתפקיד מחוץ ליחידה" 
+                                ? "bg-blue-500 hover:bg-blue-600" 
+                                : reportedDates[day.toISOString()] === "אחרי תורנות / משמרת"
+                                ? "bg-purple-500 hover:bg-purple-600"
+                                : "bg-green-500 hover:bg-green-600"
+                            }`}
+                          >
+                          </Badge>
+                        ) : null}
+
                       </div>
                     </button>
                   </DialogTrigger>
