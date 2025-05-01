@@ -196,8 +196,8 @@ export default function WorkCalendar() {
                               <DropdownMenuSubTrigger>מחוץ ליחידה</DropdownMenuSubTrigger>
                               <DropdownMenuPortal>
                                 <DropdownMenuSubContent>
-                                  <DropdownMenuItem onClick={() => sendFutureReport(day, "בתפקיד מחוץ ליחידה")}>בתפקיד מחוץ ליחידה</DropdownMenuItem>
-                                  <DropdownMenuItem onClick={() => sendFutureReport(day, "אחרי תורנות / משמרת")}>אחרי תורנות / משמרת</DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => sendFutureReport(day, "בתפקיד מחוץ ליחידה")}>בתפקיד</DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => sendFutureReport(day, "אחרי תורנות / משמרת")}>אחרי משמרת</DropdownMenuItem>
                                 </DropdownMenuSubContent>
                               </DropdownMenuPortal>
                             </DropdownMenuSub>
