@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from "react"
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth } from "date-fns"
-import { Calendar, ChevronLeft, ChevronRight, Info } from "lucide-react"
+import { Calendar, ChevronLeft, ChevronRight } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   Dialog,
   DialogContent,
@@ -15,37 +15,28 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { useTheme } from "next-themes";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuPortal, DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Badge } from "./ui/badge"
 
-type WorkDay = {
-  date: string
-  isWorkDay: boolean
-}
+type FutureReportStatus = "בתפקיד מחוץ ליחידה" | "אחרי תורנות / משמרת" | "חופשה שנתית"
 
 export default function WorkCalendar() {
   const [currentDate, setCurrentDate] = useState(new Date())
-  const [workDays, setWorkDays] = useState<WorkDay[]>([])
-  const [stats, setStats] = useState({ workDays: 0, nonWorkDays: 0 })
   const { theme } = useTheme();
+  const [reportedDates, setReportedDates] = useState<Record<string, FutureReportStatus>>({})
 
   // Load saved work days from localStorage on component mount
   useEffect(() => {
-    const savedWorkDays = localStorage.getItem("workDays")
-    if (savedWorkDays) {
-      setWorkDays(JSON.parse(savedWorkDays))
+    const savedFutureReports = localStorage.getItem("futureReports")
+    if (savedFutureReports) {
+      setReportedDates(JSON.parse(savedFutureReports))
     }
   }, [])
 
   // Save work days to localStorage whenever they change
   useEffect(() => {
-    localStorage.setItem("workDays", JSON.stringify(workDays))
-
-    // Calculate stats
-    const workCount = workDays.filter((day) => day.isWorkDay).length
-    setStats({
-      workDays: workCount,
-      nonWorkDays: workDays.length - workCount,
-    })
-  }, [workDays])
+    localStorage.setItem("futureReports", JSON.stringify(reportedDates))
+  }, [reportedDates])
 
   // Get all days in the current month
   const monthStart = startOfMonth(currentDate)
@@ -66,78 +57,23 @@ export default function WorkCalendar() {
     setCurrentDate(newDate)
   }
 
-  // Toggle work/non-work status for a day
-  const toggleWorkDay = (date: Date) => {
-    const dateString = date.toISOString().split("T")[0]
-    const existingDay = workDays.find((day) => day.date === dateString)
-
-    if (existingDay) {
-      // Toggle existing day
-      setWorkDays(workDays.map((day) => (day.date === dateString ? { ...day, isWorkDay: !day.isWorkDay } : day)))
-    } else {
-      // Add new day (default to work day)
-      setWorkDays([...workDays, { date: dateString, isWorkDay: true }])
-    }
-  }
-
-  // Check if a day is marked as a work day
-  const isWorkDay = (date: Date) => {
-    const dateString = date.toISOString().split("T")[0]
-    const day = workDays.find((day) => day.date === dateString)
-    return day ? day.isWorkDay : false
-  }
-
-  // Check if a day has been marked at all
-  const isMarked = (date: Date) => {
-    const dateString = date.toISOString().split("T")[0]
-    return workDays.some((day) => day.date === dateString)
+  const sendFutureReport = (date: Date, status: FutureReportStatus) => {
+    setReportedDates((prev) => ({
+      ...prev,
+      [date.toISOString()]: status,
+    }))
   }
 
   return (
     <div className="container mx-auto">
       <Card className="max-w-3xl mx-auto">
         <CardHeader className="pb-2">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between ml-auto">
             <CardTitle className="text-2xl font-bold flex items-center gap-2">
+              דוח 1
               <Calendar className="h-6 w-6" />
-              Work Day Tracker
             </CardTitle>
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <Info className="h-5 w-5" />
-                  <span className="sr-only">Stats</span>
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Your Statistics</DialogTitle>
-                  <DialogDescription>Summary of your work and non-work days</DialogDescription>
-                </DialogHeader>
-                <div className="grid gap-4 py-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <Card>
-                      <CardHeader className="pb-2">
-                        <CardTitle className="text-lg">Work Days</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-3xl font-bold">{stats.workDays}</p>
-                      </CardContent>
-                    </Card>
-                    <Card>
-                      <CardHeader className="pb-2">
-                        <CardTitle className="text-lg">Non-Work Days</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-3xl font-bold">{stats.nonWorkDays}</p>
-                      </CardContent>
-                    </Card>
-                  </div>
-                </div>
-              </DialogContent>
-            </Dialog>
           </div>
-          <CardDescription>Simply mark days as work or non-work days</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="mb-4 flex items-center justify-between">
@@ -145,7 +81,7 @@ export default function WorkCalendar() {
               <ChevronLeft className="h-4 w-4 mr-1" />
               Previous
             </Button>
-            <h2 className="text-xl font-semibold">{format(currentDate, "MMMM yyyy")}</h2>
+            <h2 className="text-center text-xl font-semibold mx-4">{format(currentDate, "MMMM yyyy")}</h2>
             <Button variant="outline" onClick={nextMonth}>
               Next
               <ChevronRight className="h-4 w-4 ml-1" />
@@ -162,25 +98,60 @@ export default function WorkCalendar() {
 
           <div className="grid grid-cols-7 gap-1">
             {daysInMonth.map((day, index) => {
-              const isWork = isWorkDay(day)
-              const marked = isMarked(day)
 
               return (
-                <button
-                  key={index}
-                  onClick={() => toggleWorkDay(day)}
-                  className={`
-                    aspect-square p-1 rounded-md relative
-                    ${!isSameMonth(day, currentDate) ? "opacity-50" : ""}
-                    ${marked ? (isWork ? "bg-green-500 hover:bg-green-600" : "bg-red-500 hover:bg-red-600") : (theme=="light" ? "hover:bg-gray-100" : "hover:bg-gray-900")}
-                    transition-colors
-                  `}
-                >
-                  <div className="flex flex-col h-full justify-between">
-                    <span className="text-sm">{format(day, "d")}</span>
-                    {marked && <span className="text-xs mt-1">{isWork ? "Work" : "Off"}</span>}
-                  </div>
-                </button>
+                <Dialog key={index}>
+                  <DialogTrigger asChild>
+                    <button
+                      key={index}
+                      className={`
+                        aspect-square p-1 rounded-md relative
+                        ${!isSameMonth(day, currentDate) ? "opacity-50" : ""}
+                        ${(theme=="light" ? "hover:bg-gray-100" : "hover:bg-gray-900")}
+                        transition-colors
+                      `}
+                    >
+                      <div className="flex flex-col h-full justify-between">
+                        <span className="text-sm">{format(day, "d")}</span>
+                        {reportedDates[day.toISOString()] ? <Badge className="hidden sm:block">{reportedDates[day.toISOString()]}</Badge> : null}
+                        {reportedDates[day.toISOString()] ? <Badge className="block sm:hidden"></Badge> : null}
+                      </div>
+                    </button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Details for {format(day, "MMMM d, yyyy")}</DialogTitle>
+                      <DialogDescription>
+                        <div className="flex flex-col">
+                          <span className={`text-sm`}>
+                            {reportedDates[day.toISOString()]}
+                          </span>
+                        </div>
+                      </DialogDescription>
+                    </DialogHeader>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="outline" className="mt-4">
+                          ?איפה תהיו בתאריך היעד
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className="w-40">
+                        <DropdownMenuGroup>
+                          <DropdownMenuSub>
+                            <DropdownMenuSubTrigger>מחוץ ליחידה</DropdownMenuSubTrigger>
+                            <DropdownMenuPortal>
+                              <DropdownMenuSubContent>
+                                <DropdownMenuItem onClick={(e) => sendFutureReport(day, "בתפקיד מחוץ ליחידה")}>בתפקיד מחוץ ליחידה</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => sendFutureReport(day, "אחרי תורנות / משמרת")}>אחרי תורנות / משמרת</DropdownMenuItem>
+                              </DropdownMenuSubContent>
+                            </DropdownMenuPortal>
+                          </DropdownMenuSub>
+                          <DropdownMenuItem onClick={() => sendFutureReport(day, "חופשה שנתית")}>חופשה שנתית</DropdownMenuItem>
+                        </DropdownMenuGroup>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </DialogContent>
+                </Dialog>
               )
             })}
           </div>

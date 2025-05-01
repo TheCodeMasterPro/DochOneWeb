@@ -1,11 +1,11 @@
 import "@/styles/globals.css";
 import { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google"
+import { Varela_Round } from "next/font/google"
 import { Providers } from "./providers";
 import { siteConfig } from "@/config/site";
 import { Navbar } from "@/components/navbar";
 
-const inter = Inter({ subsets: ["latin"] })
+const inter = Varela_Round({ subsets: ["hebrew"], weight: "400" });
 
 export const metadata: Metadata = {
   title: {
