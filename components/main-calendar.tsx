@@ -85,8 +85,15 @@ export default function WorkCalendar() {
   }
   
   const today = new Date()
-  const israelDateToday = new Date(today.toLocaleString("en-US", { timeZone: "Asia/Jerusalem" }))
-  
+  const israelDate = new Date(today.toLocaleString("en-US", { timeZone: "Asia/Jerusalem" }))
+
+  const isDateToday = (date: Date) => {
+    return isToday(date) && 
+           date.getDate() === israelDate.getDate() &&
+           date.getMonth() === israelDate.getMonth() &&
+           date.getFullYear() === israelDate.getFullYear()
+  }
+
   return (
     <div className="w-full max-w-3xl px-2 sm:px-4 mx-auto">
       <Card className="w-full">
@@ -139,7 +146,7 @@ export default function WorkCalendar() {
                       `}
                     >
                       <div className="flex flex-col h-full justify-between">
-                        <span className={`${day == israelDateToday ? "bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center mx-auto" : ""}`}>
+                        <span className={`${isDateToday(day) ? "bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center mx-auto" : ""}`}>
                           {format(day, "d")}
                         </span>
                         {reportedDates[day.toISOString()] ? (
