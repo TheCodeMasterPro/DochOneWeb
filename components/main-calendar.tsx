@@ -107,7 +107,7 @@ export default function WorkCalendar() {
                       className={`
                         aspect-square p-1 rounded-md relative
                         ${!isSameMonth(day, currentDate) ? "opacity-50" : ""}
-                        ${(theme=="light" ? "hover:bg-gray-100" : "hover:bg-gray-900")}
+                        hover:bg-primary-50
                         transition-colors
                       `}
                     >
@@ -122,11 +122,9 @@ export default function WorkCalendar() {
                     <DialogHeader>
                       <DialogTitle>Details for {format(day, "MMMM d, yyyy")}</DialogTitle>
                       <DialogDescription>
-                        <div className="flex flex-col">
                           <span className={`text-sm`}>
                             {reportedDates[day.toISOString()]}
                           </span>
-                        </div>
                       </DialogDescription>
                     </DialogHeader>
                     <DropdownMenu>
