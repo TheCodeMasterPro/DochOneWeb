@@ -15,9 +15,10 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { useTheme } from "next-themes";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuPortal, DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Badge } from "./ui/badge"
 import StatusSelector from "./status-selector"
+import axios from 'axios';
+import { url } from "inspector"
 
 type FutureReportStatus = "בתפקיד מחוץ ליחידה" | "אחרי תורנות / משמרת" | "חופשה שנתית"
 
@@ -75,6 +76,11 @@ export default function WorkCalendar() {
       ...prev,
       [date.toISOString()]: status,
     }))
+    axios.post('http://localhost/send-future-report', {
+      username: "yoav",
+      date: date.toISOString(),
+      status: status,
+    })
   }
 
   const removeFutureReport = (date: Date) => {
@@ -82,6 +88,10 @@ export default function WorkCalendar() {
       const newReports = { ...prev }
       delete newReports[date.toISOString()]
       return newReports
+    })
+    axios.post('http://localhost/remove-future-report', {
+      username: "yoav",
+      date: date.toISOString(),
     })
   }
   
@@ -213,16 +223,7 @@ export default function WorkCalendar() {
                             value = option as FutureReportStatus;
                           }
                           if (value) {
-                            setReportedDates(prev => ({
-                              ...prev,
-                              [day.toISOString()]: value
-                            }))
-                          } else {
-                            setReportedDates(prev => {
-                              const newDates = {...prev}
-                              delete newDates[day.toISOString()]
-                              return newDates
-                            })
+                            sendFutureReport(day, value)
                           }
                         }}
                       />
