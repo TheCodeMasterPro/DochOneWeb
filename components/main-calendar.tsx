@@ -84,12 +84,11 @@ export default function WorkCalendar() {
     })
   }
   
-  const today = new Date()
-  const israelDate = new Date(today.toLocaleString("en-US", { timeZone: "Asia/Jerusalem" }))
-
   const isDateToday = (date: Date) => {
-    return isToday(date) && 
-           date.getDate() === israelDate.getDate() &&
+    const today = new Date()
+    const israelDate = new Date(today.toLocaleString("en-US", { timeZone: "Asia/Jerusalem" }))
+
+    return date.getDate() === israelDate.getDate() &&
            date.getMonth() === israelDate.getMonth() &&
            date.getFullYear() === israelDate.getFullYear()
   }
