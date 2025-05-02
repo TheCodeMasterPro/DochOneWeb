@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, startOfWeek, endOfWeek, addDays, isToday } from "date-fns"
-import { Calendar, ChevronLeft, ChevronRight, Trash2 } from "lucide-react"
+import { Calendar, ChevronLeft, ChevronRight, Trash2, X } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -17,6 +17,7 @@ import {
 import { useTheme } from "next-themes";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuPortal, DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Badge } from "./ui/badge"
+import StatusSelector from "./status-selector"
 
 type FutureReportStatus = "בתפקיד מחוץ ליחידה" | "אחרי תורנות / משמרת" | "חופשה שנתית"
 
@@ -184,40 +185,58 @@ export default function WorkCalendar() {
                           {reportedDates[day.toISOString()]}
                       </DialogDescription>
                     </DialogHeader>
-                    <div className="flex gap-2 mt-4">
+                      <StatusSelector
+                        title="בחר סטטוס"
+                        options={[
+                          {
+                            id: " מחוץ ליחידה",
+                            label: "מחוץ ליחידה",
+                            subOptions: [
+                              {
+                                id: "בתפקיד מחוץ ליחידה",
+                                label: "בתפקיד מחוץ ליחידה"
+                              },
+                              {
+                                id: "אחרי תורנות / משמרת",
+                                label: "אחרי תורנות / משמרת"
+                              }
+                            ]
+                          },
+                          {
+                            id: "חופשה שנתית",
+                            label: "חופשה שנתית"
+                          }
+                        ]}
+                        onSelect={(option, subOption) => {
+                          let value: FutureReportStatus | undefined;
+                          if (option != "מחוץ ליחידה") {
+                            value = option as FutureReportStatus;
+                          }
+                          if (value) {
+                            setReportedDates(prev => ({
+                              ...prev,
+                              [day.toISOString()]: value
+                            }))
+                          } else {
+                            setReportedDates(prev => {
+                              const newDates = {...prev}
+                              delete newDates[day.toISOString()]
+                              return newDates
+                            })
+                          }
+                        }}
+                      />
                     {reportedDates[day.toISOString()] && (
-                        <Button 
-                          variant="destructive" 
-                          size="icon"
-                          onClick={() => removeFutureReport(day)}
-                          title="מחק דיווח עתידי"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      )}
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="outline" className="flex-grow text-xs sm:text-sm">
-                            ?איפה תהיו בתאריך היעד
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent className="w-40">
-                          <DropdownMenuGroup>
-                            <DropdownMenuSub>
-                              <DropdownMenuSubTrigger>מחוץ ליחידה</DropdownMenuSubTrigger>
-                              <DropdownMenuPortal>
-                                <DropdownMenuSubContent>
-                                  <DropdownMenuItem onClick={() => sendFutureReport(day, "בתפקיד מחוץ ליחידה")}>בתפקיד</DropdownMenuItem>
-                                  <DropdownMenuItem onClick={() => sendFutureReport(day, "אחרי תורנות / משמרת")}>אחרי משמרת</DropdownMenuItem>
-                                </DropdownMenuSubContent>
-                              </DropdownMenuPortal>
-                            </DropdownMenuSub>
-                            <DropdownMenuItem onClick={() => sendFutureReport(day, "חופשה שנתית")}>חופשה שנתית</DropdownMenuItem>
-                          </DropdownMenuGroup>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                      <Button
+                        variant="destructive"
+                        className="w-full text-center flex items-center justify-center gap-2"
+                        onClick={() => removeFutureReport(day)}
+                      >
+                        <X className="h-4 w-4" />
+                        <span>מחק דיווח עתידי</span>
+                      </Button>
 
-                    </div>
+                      )}
                   </DialogContent>
                 </Dialog>
               )
