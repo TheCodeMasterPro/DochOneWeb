@@ -165,7 +165,7 @@ export default function WorkCalendar() {
                       `}
                     >
                       <div className="flex flex-col h-full justify-between">
-                        <span className={`${isDateToday(day) ? "bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center mx-auto" : ""}`}>
+                        <span className={`${isDateToday(day) ? "bg-blue-500 rounded-full w-6 h-6 flex items-center justify-center mx-auto" : ""}`}>
                           {format(day, "d")}
                         </span>
                         {reportedDates[day.toISOString()] ? (
