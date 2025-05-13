@@ -33,13 +33,15 @@ export default function RootLayout({
   return (
     <html suppressHydrationWarning lang="en">
       <head />
-      <body className={`${inter.className} overflow-hidden`}>
+      <body className={`${inter.className}`}>
         <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
-          <div className="relative flex flex-col h-screen">
-            <Navbar />
-            <main className="container mx-auto px-2 flex-1 flex items-center">
-              {children}
-            </main>
+          <div className="relative flex flex-col min-h-dvh justify-center">
+            <div className="flex flex-col">
+              <Navbar />
+              <main className="container mx-auto px-2 flex-1 flex items-center min-h-fit max-w-xl z-50 p-6">
+                {children}
+              </main>
+            </div>
           </div>
         </Providers>
       </body>

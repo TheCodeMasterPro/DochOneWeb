@@ -19,6 +19,7 @@ import { Badge } from "./ui/badge"
 import StatusSelector from "./status-selector"
 import axios from 'axios';
 import { url } from "inspector"
+import { unstable_noStore as noStore } from "next/cache"
 
 type FutureReportStatus = "בתפקיד מחוץ ליחידה" | "אחרי תורנות / משמרת" | "חופשה שנתית"
 
@@ -26,6 +27,7 @@ export default function WorkCalendar() {
   const [currentDate, setCurrentDate] = useState(new Date())
   const { theme } = useTheme();
   const [reportedDates, setReportedDates] = useState<Record<string, FutureReportStatus>>({})
+  const [currentDay, setCurrentDay] = useState(new Date())
 
   // Load saved work days from localStorage on component mount
   useEffect(() => {
@@ -33,6 +35,10 @@ export default function WorkCalendar() {
     if (savedFutureReports) {
       setReportedDates(JSON.parse(savedFutureReports))
     }
+  }, [])
+
+  useEffect(() => {
+    setCurrentDay(new Date())
   }, [])
 
   // Save work days to localStorage whenever they change
@@ -45,7 +51,7 @@ export default function WorkCalendar() {
   const monthEnd = endOfMonth(currentDate)
   const calendarStart = startOfWeek(monthStart)
   const calendarEnd = endOfWeek(monthEnd)
-  
+
   // Calculate days needed to fill the last row
   const daysInCalendar = eachDayOfInterval({ start: calendarStart, end: calendarEnd })
   const remainingCells = 42 - daysInCalendar.length // 42 = 6 rows × 7 days
@@ -94,27 +100,30 @@ export default function WorkCalendar() {
       date: date.toISOString(),
     })
   }
-  
+
   const isDateToday = (date: Date) => {
+    noStore()
     const today = new Date()
     const israelDate = new Date(today.toLocaleString("en-US", { timeZone: "Asia/Jerusalem" }))
 
     return date.getDate() === israelDate.getDate() &&
-           date.getMonth() === israelDate.getMonth() &&
-           date.getFullYear() === israelDate.getFullYear()
+      date.getMonth() === israelDate.getMonth() &&
+      date.getFullYear() === israelDate.getFullYear()
   }
 
   return (
     <div className="w-full max-w-3xl px-2 sm:px-4 mx-auto">
       <Card className="w-full">
         <CardHeader className="pb-2">
-          <div className="flex items-center justify-between ml-auto">
+          <div className="flex items-center ml-auto w-full justify-center relative">
             <CardTitle className="text-xl sm:text-2xl font-bold flex items-center gap-2">
-            <Button variant="secondary" size="sm" onClick={goToCurrentMonth} className="text-xs sm:text-sm">
-                חודש נוכחי
-              </Button>
-              דוח 1
-              <Calendar className="h-5 w-5 sm:h-6 sm:w-6" />
+              <div className="flex flex-col items-center gap-2">
+                <h2 className="text-center text-lg sm:text-2xl font-semibold mx-2 sm:mx-4" dir="rtl">{format(currentDate, "MMMM yyyy").replace('January', 'ינואר').replace('February', 'פברואר').replace('March', 'מרץ').replace('April', 'אפריל').replace('May', 'מאי').replace('June', 'יוני').replace('July', 'יולי').replace('August', 'אוגוסט').replace('September', 'ספטמבר').replace('October', 'אוקטובר').replace('November', 'נובמבר').replace('December', 'דצמבר')}</h2>
+              </div>
+              <div className="flex gap-2 items-center absolute right-0">
+                דוח 1
+                <Calendar className="h-5 w-5 sm:h-6 sm:w-6" />
+              </div>
             </CardTitle>
           </div>
         </CardHeader>
@@ -122,13 +131,13 @@ export default function WorkCalendar() {
           <div className="mb-4 flex items-center justify-between">
             <Button variant="outline" onClick={nextMonth} className="text-xs sm:text-sm mr-1">
               <ChevronLeft className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-               קדימה
+              קדימה
             </Button>
-            <div className="flex flex-col items-center gap-2">
-              <h2 className="text-center text-lg sm:text-2xl font-semibold mx-2 sm:mx-4" dir="rtl">{format(currentDate, "MMMM yyyy").replace('January', 'ינואר').replace('February', 'פברואר').replace('March', 'מרץ').replace('April', 'אפריל').replace('May', 'מאי').replace('June', 'יוני').replace('July', 'יולי').replace('August', 'אוגוסט').replace('September', 'ספטמבר').replace('October', 'אוקטובר').replace('November', 'נובמבר').replace('December', 'דצמבר')}</h2>
-            </div>
+            <Button variant="secondary" size="sm" onClick={goToCurrentMonth} className="text-xs sm:text-sm">
+              חודש נוכחי
+            </Button>
             <Button variant="outline" onClick={prevMonth} className="text-xs sm:text-sm ml-1">
-             אחורה
+              אחורה
               <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4 ml-1" />
             </Button>
           </div>
@@ -160,27 +169,25 @@ export default function WorkCalendar() {
                           {format(day, "d")}
                         </span>
                         {reportedDates[day.toISOString()] ? (
-                          <Badge 
-                            className={`hidden sm:block text-[10px] sm:text-xs ${
-                              reportedDates[day.toISOString()] === "בתפקיד מחוץ ליחידה" 
-                                ? "bg-blue-500 hover:bg-blue-600" 
-                                : reportedDates[day.toISOString()] === "אחרי תורנות / משמרת"
+                          <Badge
+                            className={`hidden sm:block text-[10px] sm:text-xs ${reportedDates[day.toISOString()] === "בתפקיד מחוץ ליחידה"
+                              ? "bg-blue-500 hover:bg-blue-600"
+                              : reportedDates[day.toISOString()] === "אחרי תורנות / משמרת"
                                 ? "bg-purple-500 hover:bg-purple-600"
                                 : "bg-green-500 hover:bg-green-600"
-                            }`}
+                              }`}
                           >
                             {reportedDates[day.toISOString()]}
                           </Badge>
-            ) : null }
-            {reportedDates[day.toISOString()] ? (
-                          <Badge 
-                            className={`block sm:hidden w-2 h-2 mx-auto ${
-                              reportedDates[day.toISOString()] === "בתפקיד מחוץ ליחידה" 
-                                ? "bg-blue-500" 
-                                : reportedDates[day.toISOString()] === "אחרי תורנות / משמרת"
+                        ) : null}
+                        {reportedDates[day.toISOString()] ? (
+                          <Badge
+                            className={`block sm:hidden w-2 h-2 mx-auto ${reportedDates[day.toISOString()] === "בתפקיד מחוץ ליחידה"
+                              ? "bg-blue-500"
+                              : reportedDates[day.toISOString()] === "אחרי תורנות / משמרת"
                                 ? "bg-purple-500"
                                 : "bg-green-500"
-                            }`}
+                              }`}
                           >
                           </Badge>
                         ) : null}
@@ -192,41 +199,41 @@ export default function WorkCalendar() {
                     <DialogHeader>
                       <DialogTitle className="text-right">פרטים עבור {format(day, "d MMMM yyyy").replace('January', 'ינואר').replace('February', 'פברואר').replace('March', 'מרץ').replace('April', 'אפריל').replace('May', 'מאי').replace('June', 'יוני').replace('July', 'יולי').replace('August', 'אוגוסט').replace('September', 'ספטמבר').replace('October', 'אוקטובר').replace('November', 'נובמבר').replace('December', 'דצמבר')}</DialogTitle>
                       <DialogDescription className="text-right">
-                          {reportedDates[day.toISOString()]}
+                        {reportedDates[day.toISOString()]}
                       </DialogDescription>
                     </DialogHeader>
-                      <StatusSelector
-                        title="בחר סטטוס"
-                        options={[
-                          {
-                            id: " מחוץ ליחידה",
-                            label: "מחוץ ליחידה",
-                            subOptions: [
-                              {
-                                id: "בתפקיד מחוץ ליחידה",
-                                label: "בתפקיד מחוץ ליחידה"
-                              },
-                              {
-                                id: "אחרי תורנות / משמרת",
-                                label: "אחרי תורנות / משמרת"
-                              }
-                            ]
-                          },
-                          {
-                            id: "חופשה שנתית",
-                            label: "חופשה שנתית"
-                          }
-                        ]}
-                        onSelect={(option, subOption) => {
-                          let value: FutureReportStatus | undefined;
-                          if (option != "מחוץ ליחידה") {
-                            value = option as FutureReportStatus;
-                          }
-                          if (value) {
-                            sendFutureReport(day, value)
-                          }
-                        }}
-                      />
+                    <StatusSelector
+                      title="בחר סטטוס"
+                      options={[
+                        {
+                          id: " מחוץ ליחידה",
+                          label: "מחוץ ליחידה",
+                          subOptions: [
+                            {
+                              id: "בתפקיד מחוץ ליחידה",
+                              label: "בתפקיד מחוץ ליחידה"
+                            },
+                            {
+                              id: "אחרי תורנות / משמרת",
+                              label: "אחרי תורנות / משמרת"
+                            }
+                          ]
+                        },
+                        {
+                          id: "חופשה שנתית",
+                          label: "חופשה שנתית"
+                        }
+                      ]}
+                      onSelect={(option, subOption) => {
+                        let value: FutureReportStatus | undefined;
+                        if (option != "מחוץ ליחידה") {
+                          value = option as FutureReportStatus;
+                        }
+                        if (value) {
+                          sendFutureReport(day, value)
+                        }
+                      }}
+                    />
                     {reportedDates[day.toISOString()] && (
                       <Button
                         variant="destructive"
@@ -237,7 +244,7 @@ export default function WorkCalendar() {
                         <span>מחק דיווח עתידי</span>
                       </Button>
 
-                      )}
+                    )}
                   </DialogContent>
                 </Dialog>
               )
