@@ -165,12 +165,15 @@ export default function WorkCalendar() {
                       `}
                     >
                       <div className="flex flex-col h-full justify-between">
-                        <span className={`${isDateToday(day) ? "bg-blue-500 rounded-full w-6 h-6 flex items-center justify-center mx-auto" : ""}`}>
+                        <span className={`hidden sm:block ${isDateToday(day) ? "bg-blue-500 flex items-center justify-center mx-auto w-full rounded-b-none rounded-t-md" : ""}`}>
+                          {format(day, "d")}
+                        </span>
+                        <span className={`block sm:hidden flex items-center justify-center mx-auto w-5 h-5 rounded-full ${isDateToday(day) ? "bg-blue-500" : ""}`}>
                           {format(day, "d")}
                         </span>
                         {reportedDates[day.toISOString()] ? (
                           <Badge
-                            className={`hidden sm:block text-[10px] sm:text-xs ${reportedDates[day.toISOString()] === "בתפקיד מחוץ ליחידה"
+                            className={`hidden sm:block text-[10px] sm:text-xs ${isDateToday(day) ? "rounded-t-none mt-0.5" : ""} ${reportedDates[day.toISOString()] === "בתפקיד מחוץ ליחידה"
                               ? "bg-blue-500 hover:bg-blue-600"
                               : reportedDates[day.toISOString()] === "אחרי תורנות / משמרת"
                                 ? "bg-purple-500 hover:bg-purple-600"
