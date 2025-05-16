@@ -165,7 +165,7 @@ export default function WorkCalendar() {
                       `}
                     >
                       <div className="flex flex-col h-full justify-between">
-                        <span className={`hidden sm:block ${isDateToday(day) ? "bg-blue-500 flex items-center justify-center mx-auto w-full rounded-b-none rounded-t-md" : ""}`}>
+                        <span className={`hidden sm:block ${isDateToday(day) ? reportedDates[day.toISOString()] ? "bg-blue-500 flex items-center justify-center mx-auto w-full rounded-b-none rounded-t-md" : "bg-blue-500 flex items-center justify-center mx-auto w-5 h-5 rounded-full" : ""}`}>
                           {format(day, "d")}
                         </span>
                         <span className={`block sm:hidden flex items-center justify-center mx-auto w-5 h-5 rounded-full ${isDateToday(day) ? "bg-blue-500" : ""}`}>
