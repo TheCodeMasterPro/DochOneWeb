@@ -41,6 +41,17 @@ export default function WorkCalendar() {
     setCurrentDay(new Date())
   }, [])
 
+
+  useEffect(() => {
+    axios.post('http://localhost/get-history', {
+      username: "yoav",
+      month: currentDay.getMonth() + 1,
+      year: currentDay.getFullYear(),
+    }).then((response) => {
+      console.log(response.data)
+    })
+  }, [])
+
   // Save work days to localStorage whenever they change
   useEffect(() => {
     localStorage.setItem("futureReports", JSON.stringify(reportedDates))
